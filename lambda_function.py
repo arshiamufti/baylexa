@@ -1,29 +1,14 @@
-
-"""
-This sample demonstrates a simple skill built with the Amazon Alexa Skills Kit.
-The Intent Schema, Custom Slots, and Sample Utterances for this skill, as well
-as testing instructions are located at http://amzn.to/1LzFrj6
-
-For additional samples, visit the Alexa Skills Kit Getting Started guide at
-http://amzn.to/1LGWsLG
-"""
-
 from __future__ import print_function
 from twilio.rest import TwilioRestClient
 
 
 def lambda_handler(event, context):
     """ Route the incoming request based on type (LaunchRequest, IntentRequest,
-    etc.) The JSON body of the request is provided in the event parameter.
+    etc.) The JSON body of the request is in the event parameter.
     """
     print("event.session.application.applicationId=" +
           event['session']['application']['applicationId'])
 
-    """
-    Uncomment this if statement and populate with your skill's application ID to
-    prevent someone else from configuring a skill that sends requests to this
-    function.
-    """
     # if (event['session']['application']['applicationId'] !=
     #         "amzn1.echo-sdk-ams.app.[unique-value-here]"):
     #     raise ValueError("Invalid Application ID")
@@ -67,7 +52,7 @@ def on_intent(intent_request, session):
     intent = intent_request['intent']
     intent_name = intent_request['intent']['name']
 
-    # Dispatch to your skill's intent handlers
+    # Dispatch to intent handlers
 
     if intent_name == "AMAZON.HelpIntent":
         return get_welcome_response()
@@ -96,10 +81,7 @@ def on_intent(intent_request, session):
 
 
 def on_session_ended(session_ended_request, session):
-    """ Called when the user ends the session.
-
-    Is not called when the skill returns should_end_session=true
-    """
+    """ Called when the user ends the session."""
     print("on_session_ended requestId=" + session_ended_request['requestId'] +
           ", sessionId=" + session['sessionId'])
     # add cleanup logic here
@@ -108,8 +90,7 @@ def on_session_ended(session_ended_request, session):
 
 
 def get_welcome_response():
-    """ If we wanted to initialize the session to have some attributes we could
-    add those here
+    """ Initialize the session to have no attributes (for now)
     """
     session_attributes = {}
     card_title = "Welcome"
@@ -133,8 +114,8 @@ def contact(intent, session):
                 m = intent['slots']['Message']['value']
                 try:
                         message = client.messages.create(body=m,
-                        to="+16478367351",    # Replace with your phone number
-                        from_="+15675100423") # Replace with your Twilio number
+                        to="+16478367351",    # doctor's number
+                        from_="+15675100423") # Twilio number
                         print(message.sid)
                         speech_output = "I contacted your physician"
                 except twilio.TwilioRestException as e:
@@ -152,7 +133,7 @@ def get_help(intent, session):
         problem = session['attributes']['Problems']
         speech_output = "Your problem is " + problem
     else:
-        speech_output = "I'm not sure what your problem is. You can tell me your problem"
+        speech_output = "I'm not sure what your problem is."
     #
 
     return build_response(session_attributes, build_speechlet_response(
@@ -260,7 +241,6 @@ def diagnose(intent, session):
         card_title, speech_output, reprompt_text, should_end_session))
 
 # --------------- Helpers that build all of the responses ----------------------
-
 
 def build_speechlet_response(title, output, reprompt_text, should_end_session):
     return {
